@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Product Analytics Lite</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe0;--surface:#fdf9ed;--ink:#1c1b1a;--muted:#6f6a60;--line:#e4dcc8;--accent:#1c1b1a;--accent-ink:#fdf9ed;--bar:#d9c9a0;--bad:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1815;--surface:#232019;--ink:#efe9dc;--muted:#a39c8c;--line:#38332a;--accent:#efe9dc;--accent-ink:#1a1815;--bar:#5a4e36;--bad:#ff8b82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1815;--surface:#232019;--ink:#efe9dc;--muted:#a39c8c;--line:#38332a;--accent:#efe9dc;--accent-ink:#1a1815;--bar:#5a4e36;--bad:#ff8b82;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:980px;margin:0 auto;padding:28px 16px 56px}
+h1{font-size:28px;line-height:1.15;margin:0 0 6px;font-weight:700;letter-spacing:-.01em;text-align:center}
+.sub{margin:0 auto 22px;color:var(--muted);max-width:62ch;text-align:center}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.bar.c{justify-content:center}
+button,select,textarea{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:500}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+select{border:1px solid var(--line);background:var(--surface);padding:8px 10px;border-radius:8px}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-radius:0;background:transparent}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.kpi b{display:block;font-size:24px;font-weight:700}
+.kpi span{color:var(--muted);font-size:13px}
+svg{width:100%;height:auto;display:block}
+.row{display:grid;grid-template-columns:150px 1fr 150px;gap:12px;align-items:center;padding:6px 0}
+.row .t{height:26px;background:var(--bg);border-radius:6px;overflow:hidden}
+.row .t i{display:block;height:100%;background:var(--bar);border-radius:6px}
+.row .l{font-weight:500;overflow-wrap:anywhere}
+.row .n{text-align:right;color:var(--muted);font-size:13px}
+.row .n b{color:var(--ink)}
+.steps{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.callout{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--bg);color:var(--muted)}
+.callout b{color:var(--bad)}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;min-width:560px;width:100%;font-size:14px}
+th{font-weight:600;color:var(--muted);text-align:center;padding:6px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:3px}
+td.c{text-align:center;border-radius:5px;min-width:54px;padding:8px 4px}
+td.coh{white-space:nowrap;padding-right:12px}
+.empty{padding:36px;text-align:center;color:var(--muted)}
+.note{color:var(--muted);font-size:13px;margin:8px 0 0}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+summary{cursor:pointer;font-weight:600}
+textarea{width:100%;min-height:110px;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+.how{margin:44px auto 0;max-width:760px;font-size:14px;color:var(--muted)}
+.how h2{font-size:16px;color:var(--ink);margin:30px 0 10px;font-weight:600}
+.how h2:first-child{margin-top:0}
+.how p{margin:0 0 10px}
+.how ol{margin:0;padding:0;list-style:none;counter-reset:s}
+.how li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px 12px 52px;margin-bottom:10px;position:relative}
+.how li::before{content:counter(s);position:absolute;left:16px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center}
+.how li b,.how dt{color:var(--ink);font-weight:600}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0}
+.terms div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.terms dd{margin:2px 0 0}
+.how pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;overflow-x:auto;color:var(--ink);font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;margin:0 0 10px}
+:root{--hi:#c4622d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hi:#e8895a}}
+:root[data-theme="dark"]{--hi:#e8895a}
+section:not([hidden]){animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fo{from{opacity:0}to{opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.kpi,.card{transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.row{border-radius:8px;transition:background .15s}
+.row:hover{background:var(--bg)}
+.row .t i{width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--hi) 45%,transparent),var(--hi));transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.row .t i.on{width:var(--w)}
+.gl{stroke:var(--line)}
+.ax{fill:var(--muted);font-size:10px}
+.ln{fill:none;stroke:var(--hi);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s ease forwards}
+.area{animation:fo .9s ease .3s both}
+.s0{stop-color:var(--hi);stop-opacity:.35}
+.s1{stop-color:var(--hi);stop-opacity:0}
+.cx{stroke:var(--muted);stroke-dasharray:3 3;opacity:0;transition:opacity .15s}
+.cd{fill:var(--hi);stroke:var(--surface);stroke-width:2;opacity:0;transition:opacity .15s}
+.tip{position:absolute;pointer-events:none;transform:translate(-50%,-100%);background:var(--accent);color:var(--accent-ink);padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.35;white-space:nowrap}
+td.c{transition:transform .15s}
+td.c:hover{transform:scale(1.1)}
+#rchart{margin-bottom:16px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.ln{stroke-dashoffset:0}}
+@media (max-width:640px){.row{grid-template-columns:1fr}.row .n{text-align:left}}
+</style>
+</head>
+<body>
+<main>
+<h1>Product Analytics Lite</h1>
+<p class="sub">Upload an events file (CSV, Excel or PDF) and get usage trends, conversion funnels and retention cohorts, all in your browser. Nothing is uploaded anywhere.</p>
+
+<div class="bar c">
+  <button id="sample" class="primary" type="button">Load sample data</button>
+  <button id="file" type="button">Upload CSV, Excel or PDF</button>
+  <input id="fileIn" type="file" accept=".csv,.xlsx,.xls,.xlsm,.pdf,text/csv,application/pdf" hidden>
+  <div class="seg" role="group" aria-label="View">
+    <button data-v="ov" aria-pressed="true" type="button">Overview</button>
+    <button data-v="fu" aria-pressed="false" type="button">Funnel</button>
+    <button data-v="re" aria-pressed="false" type="button">Retention</button>
+  </div>
+</div>
+<p class="note" id="msg" role="status" style="text-align:center"></p>
+
+<div id="empty" class="card empty">No data yet. Load the sample data, or upload a CSV, Excel or PDF file with the columns user_id, event and timestamp.</div>
+
+<section id="ov" hidden>
+  <div class="kpis" id="kpis"></div>
+  <div class="card"><h2>Daily active users</h2><div id="chart"></div></div>
+  <div class="card"><h2>Top events</h2><div id="top"></div></div>
+</section>
+
+<section id="fu" hidden>
+  <div class="card">
+    <h2>Funnel</h2>
+    <div class="steps" id="steps"></div>
+    <div id="funnel"></div>
+    <div class="callout" id="drop" hidden></div>
+    <p class="note">A user counts toward a step only if they did it after completing the step before it.</p>
+  </div>
+</section>
+
+<section id="re" hidden>
+  <div class="card">
+    <h2>Retention by weekly cohort</h2>
+    <div class="steps"><label for="rev">Counts as active when a user does</label><select id="rev"></select></div>
+    <div id="rchart"></div>
+    <div class="wrap"><table id="ret"></table></div>
+    <p class="note">Cohorts group users by the week of their first event. Week N is the Nth 7-day period after each user’s first event. Cells are blank until every user in the cohort has had time to reach that week.</p>
+  </div>
+</section>
+
+<details>
+<summary>CSV format and paste</summary>
+<p class="note">Columns: <b>user_id</b>, <b>event</b>, <b>timestamp</b> (ISO dates such as 2026-09-14 or 2026-09-14T10:30:00Z). Other column names like user, event_name and time also work.</p>
+<textarea id="csv" spellcheck="false" placeholder="user_id,event,timestamp&#10;u1,signup,2026-09-01T09:00:00Z&#10;u1,create_project,2026-09-01T09:20:00Z"></textarea>
+<div class="bar" style="margin:10px 0 0"><button id="imp" type="button">Analyze pasted CSV</button></div>
+</details>
+
+<section class="how">
+<h2>What this tool does</h2>
+<p>Product analytics tools answer three everyday questions: how many people use the product, where they give up on a flow, and whether they come back. This tool answers the same three from a plain CSV of events, with no setup, no account and no tracking code. It’s a learning and prototyping tool, not a replacement for a full analytics platform.</p>
+<p>An <b>event</b> is one row: one user did one action at one moment, such as signup, create_project or upgrade. Everything on the page is calculated from those rows.</p>
+
+<h2>How to use it</h2>
+<ol>
+<li><b>Get some data in.</b> Click “Load sample data” to try it with 1,500 made-up users, or click “Upload CSV, Excel or PDF” to use your own. You can also paste CSV text into the box at the bottom of the page.</li>
+<li><b>Start with Overview.</b> Check that the user count, event count and date range look right. If they don’t, your CSV columns or dates probably need fixing before you trust anything else.</li>
+<li><b>Build a funnel.</b> Open the Funnel tab, then choose the events in the order users should do them. Use “Add step” or “Remove last” to change the length, from 2 to 5 steps. Read the bars from top to bottom and check the callout for the biggest drop-off.</li>
+<li><b>Check retention.</b> Open the Retention tab and pick which event counts as “active”. Choose a meaningful action such as create_project instead of any event, because opening the app once is a weak sign of value.</li>
+<li><b>Change one thing and compare.</b> Try a different funnel step or a different active event, and see how the picture moves. That’s the quickest way to find what matters.</li>
+</ol>
+
+<h2>What each view tells you</h2>
+<dl class="terms">
+<div><dt>Overview</dt><dd>Users is the count of distinct user_id values. Daily active users is how many distinct users did anything on a given day. The 7-day average smooths out weekday and weekend swings.</dd></div>
+<div><dt>Funnel</dt><dd>A user counts toward a step only if they did it after completing the step before. Each step shows the number of users, the share of the previous step, and the width of the bar compared with step one.</dd></div>
+<div><dt>Retention</dt><dd>Users are grouped into cohorts by the week of their first event. Week 0 is their first 7 days, week 1 is the next 7 days, and so on. Each cell is the share of the cohort active in that week. Darker means more retained.</dd></div>
+<div><dt>Blank cells</dt><dd>A cell stays blank until every user in that cohort has had enough time to reach that week. This stops recent cohorts from looking worse than they really are.</dd></div>
+</dl>
+
+<h2>How to read the sample data</h2>
+<p>The sample is invented for the demo. In it, about 70% of new users finish onboarding, and roughly 10% make it all the way from signup to upgrade. The funnel makes the weakest step easy to find. In the Retention tab with “any event” selected, activity falls from 100% in week 0 to around 40% in week 1, then keeps declining more slowly, which is a typical shape for a product people try and only some keep using.</p>
+<p>Questions to ask of your own data: where do most people drop out? Are newer cohorts retained better than older ones after a change? Do users who reach a certain step come back more often?</p>
+
+<h2>File formats and columns</h2>
+<p>CSV, Excel (.xlsx or .xls) and PDF files all work. For Excel, the first row of a sheet must hold the column headers, and the tool uses the first sheet that has them. For PDF, the file needs a table made of selectable text with the same header row. Scanned images don’t work. If a PDF doesn’t read properly, export the table as CSV or Excel instead.</p>
+<p>You need three columns. The names user, event_name and time also work. Timestamps should be ISO dates or date-times.</p>
+<pre>user_id,event,timestamp
+u1,signup,2026-09-01T09:00:00Z
+u1,create_project,2026-09-01T09:20:00Z
+u2,signup,2026-09-02T14:05:00Z</pre>
+
+<h2>Limits and privacy</h2>
+<p>It has no user properties, so it can’t split a funnel by plan or country, and it shows one funnel at a time. Very large files may be slow, since everything is processed in your browser. Your data never leaves your device: nothing is uploaded or stored. The Excel and PDF readers are small code libraries that download the first time you use them.</p>
+</section>
+</main>
+
+<script>
+(function(){
+var D=null,view='ov',stepSel=[];
+var $=function(i){return document.getElementById(i)};
+var DAY=864e5,WEEK=7*DAY;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fmt(n){return n.toLocaleString('en-IN')}
+function pct(a,b){return b>0?Math.round(a/b*1000)/10:0}
+function ds(t){return new Date(t).toISOString().slice(0,10)}
+
+function parseCSV(t){
+  var rows=[],r=[],c='',q=false,i;
+  for(i=0;i<t.length;i++){var ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch==='"')q=true;
+    else if(ch===','){r.push(c);c=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.length>1||r[0]!=='')rows.push(r);r=[]}
+    else c+=ch}
+  if(c!==''||r.length){r.push(c);rows.push(r)}
+  return rows;
+}
+function col(h,n){for(var i=0;i<n.length;i++){var k=h.indexOf(n[i]);if(k>-1)return k}return -1}
+
+function ingest(rows){
+  var h=rows[0].map(function(x){return x.trim().toLowerCase()});
+  var iu=col(h,['user_id','user','userid','distinct_id']),ie=col(h,['event','event_name','name']),it=col(h,['timestamp','time','date','created_at']);
+  if(iu<0||ie<0||it<0){$('msg').textContent='Could not find user_id, event and timestamp columns in the header row.';return}
+  var users={},cnt={},n=0,bad=0;
+  rows.slice(1).forEach(function(r){
+    var t=toTime(r[it]),u=(r[iu]||'').trim(),e=(r[ie]||'').trim();
+    if(!u||!e||isNaN(t)){bad++;return}
+    (users[u]=users[u]||[]).push([t,e]);cnt[e]=(cnt[e]||0)+1;n++;
+  });
+  if(!n){$('msg').textContent='No valid rows found. Check the timestamp format.';return}
+  var min=Infinity,max=-Infinity;
+  Object.keys(users).forEach(function(u){users[u].sort(function(a,b){return a[0]-b[0]});var a=users[u];min=Math.min(min,a[0][0]);max=Math.max(max,a[a.length-1][0])});
+  var names=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
+  D={users:users,cnt:cnt,names:names,n:n,min:min,max:max};
+  stepSel=defaultSteps();
+  $('msg').textContent='Loaded '+fmt(n)+' events from '+fmt(Object.keys(users).length)+' users'+(bad?'; skipped '+bad+' invalid rows':'')+'.';
+  $('rev').innerHTML='<option value="">any event</option>'+names.map(function(x){return '<option>'+esc(x)+'</option>'}).join('');
+  show();
+}
+
+function defaultSteps(){
+  var pref=['signup','onboarding_complete','create_project','invite_teammate'];
+  var hit=pref.filter(function(p){return D.cnt[p]});
+  return hit.length>=2?hit:D.names.slice(0,Math.min(3,D.names.length));
+}
+
+function show(){
+  $('empty').hidden=!!D;
+  ['ov','fu','re'].forEach(function(v){$(v).hidden=!D||v!==view});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(b){b.setAttribute('aria-pressed',b.dataset.v===view)});
+  if(!D)return;
+  if(view==='ov'){overview();grow()}else if(view==='fu')funnel();else retention();
+}
+
+function overview(){
+  var uids=Object.keys(D.users),days={},maxC=0;
+  uids.forEach(function(u){var seen={};D.users[u].forEach(function(x){var d=ds(x[0]);if(!seen[d]){seen[d]=1;days[d]=(days[d]||0)+1}})});
+  var keys=Object.keys(days).sort(),vals=keys.map(function(k){return days[k]});
+  vals.forEach(function(v){maxC=Math.max(maxC,v)});
+  var last7=keys.slice(-7),avg=last7.length?Math.round(last7.reduce(function(s,k){return s+days[k]},0)/last7.length):0;
+  $('kpis').innerHTML=[[uids.length,'Users'],[D.n,'Events'],[avg,'Avg daily active users, last 7 days'],[ds(D.min)+' to '+ds(D.max),'Date range']].map(function(k){return '<div class="kpi"><b'+(typeof k[0]==='number'?' data-n="'+k[0]+'">0':'>'+k[0])+'</b><span>'+k[1]+'</span></div>'}).join('');
+  countUp();
+  lineChart($('chart'),keys,vals,'users',function(v){return fmt(Math.round(v))});
+  var top=D.names.slice(0,8),m=D.cnt[top[0]];
+  $('top').innerHTML=top.map(function(e){return '<div class="row"><div class="l">'+esc(e)+'</div><div class="t"><i style="--w:'+Math.round(D.cnt[e]/m*100)+'%"></i></div><div class="n"><b>'+fmt(D.cnt[e])+'</b> events</div></div>'}).join('');
+}
+
+function funnel(){
+  var opts=D.names.map(function(x){return '<option>'+esc(x)+'</option>'}).join('');
+  $('steps').innerHTML=stepSel.map(function(s,i){return '<select data-i="'+i+'" aria-label="Step '+(i+1)+'">'+opts.replace('<option>'+esc(s)+'</option>','<option selected>'+esc(s)+'</option>')+'</select>'+(i<stepSel.length-1?'<span aria-hidden="true">then</span>':'')}).join('')+
+    (stepSel.length<5?'<button id="addS" type="button">Add step</button>':'')+(stepSel.length>2?'<button id="delS" type="button">Remove last</button>':'');
+  var counts=stepSel.map(function(){return 0});
+  Object.keys(D.users).forEach(function(u){
+    var ev=D.users[u],i=0,t=-Infinity;
+    for(var s=0;s<stepSel.length;s++){
+      var f=false;
+      for(;i<ev.length;i++){if(ev[i][1]===stepSel[s]&&ev[i][0]>=t){t=ev[i][0];f=true;i++;break}}
+      if(!f)break;counts[s]++;
+    }
+  });
+  $('funnel').innerHTML=stepSel.map(function(s,i){
+    var w=pct(counts[i],counts[0]),prev=i?pct(counts[i],counts[i-1]):100;
+    return '<div class="row"><div class="l">'+(i+1)+'. '+esc(s)+'</div><div class="t"><i style="--w:'+w+'%"></i></div><div class="n"><b>'+fmt(counts[i])+'</b> users'+(i?'<br>'+prev+'% of previous':'')+'</div></div>';
+  }).join('');
+  var worst=-1,wl=-1;
+  for(var k=1;k<counts.length;k++){var lost=counts[k-1]-counts[k];if(counts[k-1]>0&&lost/counts[k-1]>wl){wl=lost/counts[k-1];worst=k}}
+  var c=$('drop');
+  if(worst>0&&counts[0]>0){c.hidden=false;c.innerHTML='Biggest drop-off: <b>'+esc(stepSel[worst-1])+' to '+esc(stepSel[worst])+'</b>, where '+Math.round(wl*1000)/10+'% of users leave. Overall conversion is '+pct(counts[counts.length-1],counts[0])+'%.'}else c.hidden=true;
+  grow();
+}
+
+function retention(){
+  var ev=$('rev').value,cohorts={},maxOff=7;
+  Object.keys(D.users).forEach(function(u){
+    var a=D.users[u],f=a[0][0],ck=Math.floor(f/WEEK),o=cohorts[ck]=cohorts[ck]||{size:0,act:[],ok:[]};
+    o.size++;
+    var set={};a.forEach(function(x){if(!ev||x[1]===ev)set[Math.floor((x[0]-f)/WEEK)]=1});
+    for(var k=0;k<=maxOff;k++){if(f+k*WEEK<=D.max){o.ok[k]=(o.ok[k]||0)+1;if(set[k])o.act[k]=(o.act[k]||0)+1}}
+  });
+  var ks=Object.keys(cohorts).map(Number).sort(function(a,b){return a-b});
+  var head='<tr><th>Cohort</th><th>Users</th>'+Array.apply(null,Array(maxOff+1)).map(function(_,i){return '<th>Week '+i+'</th>'}).join('')+'</tr>';
+  var body=ks.map(function(k){
+    var o=cohorts[k],cells='';
+    for(var j=0;j<=maxOff;j++){
+      if(o.ok[j]===o.size){var p=pct(o.act[j]||0,o.size);cells+='<td class="c" title="'+(o.act[j]||0)+' of '+o.size+' users" style="background:color-mix(in srgb,var(--hi) '+Math.round(p*0.7)+'%,transparent)">'+p+'%</td>'}
+      else cells+='<td class="c"></td>';
+    }
+    return '<tr><td class="coh">Week of '+ds(k*WEEK)+'</td><td>'+fmt(o.size)+'</td>'+cells+'</tr>';
+  }).join('');
+  $('ret').innerHTML=head+body;
+  var lab=[],val=[];
+  for(var k=0;k<=maxOff;k++){var a=0,b=0;ks.forEach(function(c){a+=cohorts[c].act[k]||0;b+=cohorts[c].ok[k]||0});if(b){lab.push('Week '+k);val.push(a/b*100)}}
+  lineChart($('rchart'),lab,val,'retained',function(v){return Math.round(v)+'%'});
+}
+
+function grow(){requestAnimationFrame(function(){requestAnimationFrame(function(){Array.prototype.forEach.call(document.querySelectorAll('.row .t i'),function(i){i.classList.add('on')})})})}
+function countUp(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-n]'),function(el){
+    var to=+el.dataset.n,t0=performance.now();
+    (function step(t){var p=Math.min(1,(t-t0)/800),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(step)})(t0);
+  });
+}
+function lineChart(el,labels,vals,unit,fy){
+  var n=vals.length;if(!n){el.innerHTML='';return}
+  var W=600,H=190,P=34,mx=Math.max.apply(null,vals)||1,id=el.id+'G';
+  var X=function(i){return P+(n>1?i/(n-1):0)*(W-2*P)},Y=function(v){return H-P-v/mx*(H-2*P)};
+  var line=vals.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1)}).join(' ');
+  var grid=[0,.5,1].map(function(g){var y=Y(mx*g);return '<line class="gl" x1="'+P+'" x2="'+(W-P)+'" y1="'+y+'" y2="'+y+'"/><text class="ax" x="'+(P-6)+'" y="'+(y+4)+'" text-anchor="end">'+fy(mx*g)+'</text>'}).join('');
+  el.style.position='relative';
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+unit+' over time"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s0"/><stop offset="1" class="s1"/></linearGradient></defs>'+grid+
+    '<polygon class="area" fill="url(#'+id+')" points="'+P+','+(H-P)+' '+line+' '+X(n-1)+','+(H-P)+'"/><polyline class="ln" pathLength="1" points="'+line+'"/>'+
+    '<text class="ax" x="'+P+'" y="'+(H-8)+'">'+labels[0]+'</text><text class="ax" x="'+(W-P)+'" y="'+(H-8)+'" text-anchor="end">'+labels[n-1]+'</text>'+
+    '<line class="cx" y1="'+P+'" y2="'+(H-P)+'"/><circle class="cd" r="5"/></svg><div class="tip" hidden></div>';
+  var svg=el.querySelector('svg'),tip=el.querySelector('.tip'),cx=el.querySelector('.cx'),cd=el.querySelector('.cd');
+  function mv(e){
+    var r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,i=Math.max(0,Math.min(n-1,Math.round((x-P)/(W-2*P)*(n-1))));
+    cx.setAttribute('x1',X(i));cx.setAttribute('x2',X(i));cd.setAttribute('cx',X(i));cd.setAttribute('cy',Y(vals[i]));
+    cx.style.opacity=1;cd.style.opacity=1;tip.hidden=false;
+    tip.innerHTML='<b>'+fy(vals[i])+'</b> '+unit+'<br>'+labels[i];
+    tip.style.left=(X(i)/W*r.width)+'px';tip.style.top=(Y(vals[i])/H*r.height-10)+'px';
+  }
+  svg.addEventListener('pointermove',mv);svg.addEventListener('pointerdown',mv);
+  svg.addEventListener('pointerleave',function(){tip.hidden=true;cx.style.opacity=0;cd.style.opacity=0});
+}
+
+function toTime(v){
+  v=String(v==null?'':v).trim();if(!v)return NaN;
+  if(/^\d+(\.\d+)?$/.test(v)){var n=+v;if(n>1e12)return n;if(n>1e9)return n*1000;if(n>20000&&n<80000)return Math.round((n-25569)*864e5)}
+  return Date.parse(v);
+}
+var libs={};
+function lib(url){
+  return libs[url]||(libs[url]=new Promise(function(ok,no){var s=document.createElement('script');s.src=url;s.onload=ok;s.onerror=function(){delete libs[url];no(new Error('load'))};document.head.appendChild(s)}));
+}
+function hasCols(r){
+  var h=r.map(function(x){return String(x).trim().toLowerCase()});
+  return col(h,['user_id','user','userid','distinct_id'])>-1&&col(h,['event','event_name','name'])>-1&&col(h,['timestamp','time','date','created_at'])>-1;
+}
+function readExcel(buf){
+  lib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js').then(function(){
+    var wb=XLSX.read(buf,{type:'array',cellDates:true}),found=null;
+    wb.SheetNames.some(function(nm){
+      var rows=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,raw:true,defval:''}).map(function(r){return r.map(function(c){return c instanceof Date?c.toISOString():String(c)})});
+      if(rows.length>1&&hasCols(rows[0])){found=rows;return true}return false;
+    });
+    if(!found){$('msg').textContent='No sheet in this workbook has user_id, event and timestamp columns in its first row.';return}
+    ingest(found);
+  }).catch(function(){$('msg').textContent='Could not read this Excel file. Check your connection, or save the sheet as CSV and upload that.'});
+}
+function readPdf(buf){
+  var P='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  lib(P+'pdf.min.js').then(function(){
+    pdfjsLib.GlobalWorkerOptions.workerSrc=P+'pdf.worker.min.js';
+    return pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise;
+  }).then(function(doc){
+    var jobs=[];for(var p=1;p<=doc.numPages;p++)jobs.push(doc.getPage(p).then(function(pg){return pg.getTextContent()}));
+    return Promise.all(jobs);
+  }).then(function(pages){
+    var rows=[];
+    pages.forEach(function(tc){
+      var lines={};
+      tc.items.forEach(function(it){var s=it.str.trim();if(!s)return;var y=Math.round(it.transform[5]/3);(lines[y]=lines[y]||[]).push([it.transform[4],s])});
+      Object.keys(lines).map(Number).sort(function(a,b){return b-a}).forEach(function(y){rows.push(lines[y].sort(function(a,b){return a[0]-b[0]}).map(function(c){return c[1]}))});
+    });
+    var hi=-1;rows.some(function(r,i){if(hasCols(r)){hi=i;return true}return false});
+    if(hi<0){$('msg').textContent='Could not find a table with user_id, event and timestamp columns in this PDF. It needs selectable text, not a scanned image.';return}
+    var w=rows[hi].length,body=rows.slice(hi+1).filter(function(r){return r.length===w&&!hasCols(r)});
+    if(!body.length){$('msg').textContent='Found the header row but no data rows with the same number of columns. Check that each timestamp sits in one cell.';return}
+    ingest([rows[hi]].concat(body));
+  }).catch(function(){$('msg').textContent='Could not read this PDF. Try a text-based PDF, or export the table as CSV or Excel.'});
+}
+
+function sample(){
+  var s=20261121,R=function(){s=(s*1664525+1013904223)%4294967296;return s/4294967296};
+  var base=Date.UTC(2026,8,1),cap=Date.UTC(2026,10,20),out=['user_id,event,timestamp'];
+  function add(u,e,t){if(t<=cap)out.push(u+','+e+','+new Date(t).toISOString())}
+  for(var i=0;i<1500;i++){
+    var u='u'+i,t=base+Math.floor(R()*56)*DAY+R()*DAY,st=t;
+    add(u,'signup',t);
+    if(R()<.7){t+=R()*6*36e5;add(u,'onboarding_complete',t);
+      if(R()<.78){t+=R()*3*36e5;add(u,'create_project',t);
+        if(R()<.55){t+=R()*864e5;add(u,'invite_teammate',t);
+          if(R()<.35){t+=R()*2*DAY;add(u,'upgrade',t)}}}}
+    for(var w=1;w<=7;w++){if(R()<.42*Math.pow(.78,w-1)){add(u,R()<.5?'create_project':'app_open',st+w*WEEK+R()*6*DAY)}}
+  }
+  ingest(parseCSV(out.join('\n')));
+}
+
+$('sample').onclick=sample;
+$('file').onclick=function(){$('fileIn').click()};
+$('fileIn').onchange=function(e){
+  var f=e.target.files[0];e.target.value='';if(!f)return;
+  var ext=f.name.split('.').pop().toLowerCase(),rd=new FileReader();
+  $('msg').textContent='Reading '+f.name+'...';
+  if(ext==='xlsx'||ext==='xls'||ext==='xlsm'){rd.onload=function(){readExcel(rd.result)};rd.readAsArrayBuffer(f)}
+  else if(ext==='pdf'){rd.onload=function(){readPdf(rd.result)};rd.readAsArrayBuffer(f)}
+  else{rd.onload=function(){$('csv').value='';ingest(parseCSV(rd.result.trim()))};rd.readAsText(f)}
+};
+$('imp').onclick=function(){var t=$('csv').value.trim();if(!t){$('msg').textContent='Paste a CSV first.';return}ingest(parseCSV(t))};
+document.querySelector('.seg').addEventListener('click',function(e){var v=e.target.dataset.v;if(!v)return;view=v;show()});
+$('steps').addEventListener('change',function(e){var i=e.target.dataset.i;if(i===undefined)return;stepSel[+i]=e.target.value;funnel()});
+$('steps').addEventListener('click',function(e){
+  if(e.target.id==='addS'){stepSel.push(D.names.filter(function(n){return stepSel.indexOf(n)<0})[0]||D.names[0]);funnel()}
+  if(e.target.id==='delS'){stepSel.pop();funnel()}
+});
+$('rev').onchange=retention;
+show();
+})();
+</script>
+</body>
+</html>
